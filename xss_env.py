@@ -27,28 +27,24 @@ class XSS_Moutation():
 
     def step(self, step, action, payload, model):  # 输入动作，返回当前状态
         _, new_payload = mutation.action_payload(action, payload)
-        # 修正语法错误，移除无效的!和(MaxStep.jpg)
+        # self.observation_space[step] = action![](MaxStep.jpg)
         self.observation_space[step] = action
-        
         # done = MLP_test.mlp_test_result(quote(new_payload), model)  # 调用MLP分类器
         # done = LSTM_test.lstm_test_result(quote(new_payload), model)  # 调用LSTM分类器
         # done = SVM_single.svm_test_result(model, quote(new_payload))  # 调用SVM分类器
         done = CNN_test.cnn_test_result(quote(new_payload), model)  # 调用CNN分类器
-        
         if done:  # True 如果被检测出来是恶意样本
             reward = 0
         else:  # 没被检测出来
             # print("绕过:", quote(new_payload))
             reward = 1
-            
         return np.array(self.observation_space), reward, new_payload, done
 
-    def reset(self, data, total_steps):  # main函数里面定义一个计数器来选择攻击向量类型，到时候应该把下面这一些移到主函数里，免得调用一次计算一次
-        # seed = int(time.time())
-        # random.seed(seed)
-        # n = random.randint(2000, 5000)
-        self.payload = data[total_steps]
-        self.observation_space = space
+    def reset(self, data, total_steps):
+        if not data:
+            raise ValueError("Data list is empty in reset()")
+        self.payload = data[total_steps % len(data)]  # 避免越界
+        self.observation_space = [-1] * 75
         return self.payload
 
 

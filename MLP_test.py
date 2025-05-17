@@ -1,9 +1,12 @@
 import pickle
 import numpy as np
 from utils import GeneSeg
-from keras.preprocessing.sequence import pad_sequences
+# from keras.preprocessing.sequence import pad_sequences
+from keras.utils import pad_sequences
+
+
 detection_dir = "./file/detection.csv"
-model_dir = "./file/MLP_model"
+model_dir = "./file/MLP_model.h5"
 vec_dir = "./file/word2vec1.pickle"
 log_dir = "./log/MLP.log"
 

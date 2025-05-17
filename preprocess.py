@@ -42,11 +42,13 @@ def data_write_csv(datas):
 def data_process():
     data = []
     with open("./data/ss.csv", "r", encoding="utf-8", errors="ignore") as f:
-        reader = csv.DictReader(f, fieldnames=["payload"])  # 读csv文件，把每行中的信息映射到一个字典,字典的键由fieldnames给出
+        reader = csv.DictReader(f, fieldnames=["payload"])
         for row in reader:
             payload = row["payload"]
             data.append(payload)
-    # new_data = deduplicate(data)
+    print("Loaded payloads:", len(data))  # 新增日志
+    if not data:
+        raise ValueError("No data loaded from CSV file!")
     return data
 
 

@@ -1,8 +1,9 @@
 import pickle
 import numpy as np
 from utils import GeneSeg
-from keras.preprocessing.sequence import pad_sequences
-model_dir = "./file/LSTM_model"
+# from keras.preprocessing.sequence import pad_sequences
+from keras.utils import pad_sequences
+model_dir = "./file/LSTM_model.h5"
 vec_dir = "./file/word2vec1.pickle"
 log_dir = "./log/LSTM.log"
 

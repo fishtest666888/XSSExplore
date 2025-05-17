@@ -7,45 +7,25 @@ from keras.layers import Dense, InputLayer, Dropout, Flatten, LSTM
 from keras.optimizers import Adam
 from keras.preprocessing.sequence import pad_sequences
 detection_dir = "./file/detection.csv"
-model_dir = "./file/MLP_model"
+model_dir = "./file/MLP_model.h5"
 vec_dir = "./file/word2vec1.pickle"
 log_dir = "./log/MLP.log"
 
 
+# 修改后完整的 process_data 函数
 def process_data(data):
-    new_data = []
-    with open(vec_dir, "rb") as f:
-        word2vec = pickle.load(f)
-        dictionary = word2vec["dictionary"]
-        reverse_dictionary = word2vec["reverse_dictionary"]
-        embeddings = word2vec["embeddings"]
-        dims_num = word2vec["dims_num"]
-        input_num = word2vec["input_num"]
-
     payload = GeneSeg(data)
 
-    def to_index(data):
-        d_index = []
-        for word in data:
-            if word in dictionary.keys():  # 如果这个词存在于前面挑选出来的vocabulary_size-1个词中
-                d_index.append(dictionary[word])
-            else:
-                d_index.append(dictionary["UNK"])
-        return d_index
+    def to_index(words):
+        return [dictionary[word] if word in dictionary else dictionary["UNK"] for word in words]
 
     data_index = to_index(payload)
-    new_data.append(data_index)
-    datas = pad_sequences(new_data, maxlen=532, value=-1)
-    da = np.array(datas[0])
-    data_embed = []
-    for d in da:
-        if d != -1:
-            data_embed.append(embeddings[reverse_dictionary[d]])  # 每个词用128位的向量表示
-        else:
-            data_embed.append([0.0] * len(embeddings["UNK"]))
-    d = []
-    d.append(data_embed)
-    return np.array(d)
+    padded = pad_sequences([data_index], maxlen=532, value=-1)[0]
+
+    unk_vector = embeddings["UNK"]
+    data_embed = [embeddings[reverse_dictionary[d]] if d != -1 else unk_vector for d in padded]
+
+    return np.array([data_embed])  # shape: (1, maxlen, embed_dim)
 
 
 def mlp_detection(model, data):

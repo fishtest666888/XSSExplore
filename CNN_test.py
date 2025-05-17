@@ -1,7 +1,8 @@
 import pickle
 import numpy as np
 from utils import GeneSeg
-from keras.preprocessing.sequence import pad_sequences
+# from keras.preprocessing.sequence import pad_sequences
+from keras.utils import pad_sequences
 model_dir = "./file/Conv_model"
 vec_dir = "./file/word2vec1.pickle"
 log_dir = "./log/Conv.log"

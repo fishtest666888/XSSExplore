@@ -2,10 +2,11 @@ from utils import GeneSeg
 from datetime import datetime
 import csv, pickle, random, json
 import numpy as np
-from keras.preprocessing.sequence import pad_sequences
+# from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
+from keras.utils import pad_sequences
 
 vec_dir = "./file/word2vec1.pickle"
 pre_datas_train = "./file/pre_datas_train.csv"
@@ -83,49 +84,50 @@ def pre_process():
 
 
 def data_generator(data_dir):
-    reader = tf.TextLineReader()  # 读取器对象
-    queue = tf.train.string_input_producer([data_dir])  # 创建文件名队列
-    _, value = reader.read(queue)  # 按行读取
-    coord = tf.train.Coordinator()  # 创建一个线程管理器
-    sess = tf.Session()
-    threads = tf.train.start_queue_runners(sess=sess, coord=coord)  # 开启线程
-    while True:
-        v = sess.run(value)
-        [data, label] = v.split(b"|")
-        data = np.array(json.loads(data.decode("utf-8")))
-        label = np.array(json.loads(label.decode("utf-8")))
-        yield (data, label)
-    coord.request_stop()
-    coord.join(threads)
-    sess.close()
+    dataset = tf.data.TextLineDataset(data_dir)  # ✅ 提供文件路径作为参数
+    dataset = dataset.shuffle(buffer_size=10000)  # 可选：打乱数据
+    iterator = iter(dataset.repeat())  # 循环读取
+    return iterator
 
-
-def batch_generator(datas_dir, datas_size, batch_size, embeddings, reverse_dictionary, train=True):  # 批量数据生成器
-    batch_data = []
-    batch_label = []
+def batch_generator(datas_dir, datas_size, batch_size, embeddings, reverse_dictionary, train=True):
     generator = data_generator(datas_dir)
-    n = 0
     while True:
-        for i in range(batch_size):
-            data, label = next(generator)
-            data_embed = []
-            for d in data:
-                if d != -1:
-                    data_embed.append(embeddings[reverse_dictionary[d]])
-                else:
-                    data_embed.append([0.0] * len(embeddings["UNK"]))
-            batch_data.append(data_embed)
-            batch_label.append(label)
-            n += 1
-            if not train and n == datas_size:
-                break
-        if not train and n == datas_size:
-            yield (np.array(batch_data), np.array(batch_label))
+        batch_data = []
+        batch_label = []
+        for _ in range(batch_size):
+            try:
+                line = next(generator)
+                data_str, label_str = line.numpy().decode("utf-8").split("|")
+                data = json.loads(data_str)
+                label = json.loads(label_str)
+                data_embed = []
+                for d in data:
+                    if d != -1:
+                        data_embed.append(embeddings[reverse_dictionary[d]])
+                    else:
+                        data_embed.append([0.0] * len(embeddings["UNK"]))
+                batch_data.append(data_embed)
+                batch_label.append(label)
+            except StopIteration:
+                if not train:
+                    break
+                generator = data_generator(datas_dir)  # 重新开始
+                line = next(generator)
+                data_str, label_str = line.numpy().decode("utf-8").split("|")
+                data = json.loads(data_str)
+                label = json.loads(label_str)
+                data_embed = []
+                for d in data:
+                    if d != -1:
+                        data_embed.append(embeddings[reverse_dictionary[d]])
+                    else:
+                        data_embed.append([0.0] * len(embeddings["UNK"]))
+                batch_data.append(data_embed)
+                batch_label.append(label)
+
+        yield (np.array(batch_data), np.array(batch_label))
+        if not train and len(batch_label) < batch_size:
             break
-        else:
-            yield (np.array(batch_data), np.array(batch_label))
-            batch_data = []
-            batch_label = []
 
 
 def build_dataset(batch_size):

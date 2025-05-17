@@ -14,8 +14,8 @@ from keras.models import Sequential
 from keras.layers import Dense, InputLayer, Dropout, Flatten, LSTM
 from keras.optimizers import Adam
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-mlp_model_dir = "./file/MLP_model"
-lstm_model_dir = "./file/LSTM_model"
+mlp_model_dir = "./file/MLP_model.h5"
+lstm_model_dir = "./file/LSTM_model.h5"
 svm_model_dir = "./file/p_SVM_model"
 
 
@@ -101,7 +101,8 @@ def train(config):
     for j in range(5):
         escape_num = 0
         for i in range(1, config.episodes + 1):
-            payload = env.reset(data, i - 1)
+            idx = (i - 1) % len(data)  # 防止越界
+            payload = env.reset(data, idx)
             state = np.array(env.observation_space)
             episode_steps = 0
             rewards = 0

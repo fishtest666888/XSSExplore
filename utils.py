@@ -1,9 +1,9 @@
+# utils.py
 import nltk
 import re
 from urllib.parse import unquote
 import tensorflow as tf
-import keras.backend.tensorflow_backend as ktf
-
+from tensorflow.keras import backend as ktf  # ✅ 新式导入
 
 def GeneSeg(payload):
     # 数字泛化为"0"
@@ -30,5 +30,4 @@ def GeneSeg(payload):
 
 
 def init_session():
-    # gpu_options=tf.GPUOptions(allow_growth=True)
-    ktf.set_session(tf.Session())
+    pass  # TF2 默认启用 eager execution，不需要手动设置 session

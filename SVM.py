@@ -1,5 +1,6 @@
 import time
-from keras.preprocessing.sequence import pad_sequences
+# from keras.preprocessing.sequence import pad_sequences
+from keras.utils import pad_sequences
 from sklearn.metrics import precision_score, recall_score
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split

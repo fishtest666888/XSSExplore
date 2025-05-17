@@ -7,6 +7,7 @@ from processing import build_dataset
 from utils import init_session
 from sklearn.metrics import precision_score, recall_score
 from sklearn.metrics import accuracy_score, f1_score
+from keras.utils import pad_sequences
 
 init_session()
 batch_size = 500
@@ -41,8 +42,8 @@ def train(train_generator, train_size, input_num, dims_num):
     model.add(Dropout(0.5))
     model.add(output)
     model.compile(optimizer, loss="categorical_crossentropy", metrics=["accuracy"])
-    model.fit_generator(train_generator, steps_per_epoch=train_size // batch_size, epochs=epochs_num)
-    model.save_weights(model_dir)
+    model.fit(train_generator, steps_per_epoch=train_size // batch_size, epochs=epochs_num)
+    model.save_weights(model_dir+ ".h5")
     end = time.time()
     print("Over train job in %f s" % (end - start))
 

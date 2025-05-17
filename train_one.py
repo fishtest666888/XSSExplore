@@ -14,11 +14,14 @@ from keras.models import Sequential
 from keras.layers import Dense, InputLayer, Dropout, Flatten, LSTM, Conv1D, MaxPool1D
 from keras.optimizers import Adam
 import time
+from keras.layers import Conv1D, MaxPool1D
+
+
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-mlp_model_dir = "./file/MLP_model"
-lstm_model_dir = "./file/LSTM_model"
+mlp_model_dir = "./file/MLP_model.h5"
+lstm_model_dir = "./file/LSTM_model.h5"
 svm_model_dir = "./file/p_SVM_model"
-cnn_model_dir = "./file/Conv_model"
+cnn_model_dir = "./file/Conv_model.h5"
 
 
 def get_config():
@@ -77,32 +80,32 @@ def get_config():
 #     return xss_svm
 #
 #
-# def cnn_model(input_num, dims_num, batch_size):
-#     inputs = InputLayer(input_shape=(input_num, dims_num), batch_size=batch_size)
-#     layer1 = Conv1D(64, 3, activation="relu")
-#     layer2 = Conv1D(64, 3, activation="relu")
-#     layer3 = Conv1D(128, 3, activation="relu")
-#     layer4 = Conv1D(128, 3, activation="relu")
-#     layer5 = Dense(128, activation="relu")
-#     output = Dense(2, activation="softmax", name="Output")
-#     optimizer = Adam()
-#     model = Sequential()
-#     model.add(inputs)
-#     model.add(layer1)
-#     model.add(layer2)
-#     model.add(MaxPool1D(pool_size=2))
-#     model.add(Dropout(0.5))
-#     model.add(layer3)
-#     model.add(layer4)
-#     model.add(MaxPool1D(pool_size=2))
-#     model.add(Dropout(0.5))
-#     model.add(Flatten())
-#     model.add(layer5)
-#     model.add(Dropout(0.5))
-#     model.add(output)
-#     model.compile(optimizer, loss="categorical_crossentropy", metrics=["accuracy"])
-#     model.load_weights(cnn_model_dir, by_name=False)
-#     return model
+def cnn_model(input_num, dims_num, batch_size):
+    inputs = InputLayer(input_shape=(input_num, dims_num), batch_size=batch_size)
+    layer1 = Conv1D(64, 3, activation="relu")
+    layer2 = Conv1D(64, 3, activation="relu")
+    layer3 = Conv1D(128, 3, activation="relu")
+    layer4 = Conv1D(128, 3, activation="relu")
+    layer5 = Dense(128, activation="relu")
+    output = Dense(2, activation="softmax", name="Output")
+    optimizer = Adam()
+    model = Sequential()
+    model.add(inputs)
+    model.add(layer1)
+    model.add(layer2)
+    model.add(MaxPool1D(pool_size=2))
+    model.add(Dropout(0.5))
+    model.add(layer3)
+    model.add(layer4)
+    model.add(MaxPool1D(pool_size=2))
+    model.add(Dropout(0.5))
+    model.add(Flatten())
+    model.add(layer5)
+    model.add(Dropout(0.5))
+    model.add(output)
+    model.compile(optimizer, loss="categorical_crossentropy", metrics=["accuracy"])
+    model.load_weights(cnn_model_dir, by_name=False)
+    return model
 
 
 def train(config):

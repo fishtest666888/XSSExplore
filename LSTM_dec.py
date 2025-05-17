@@ -5,8 +5,11 @@ import preprocess
 from keras.models import Sequential
 from keras.layers import Dense, InputLayer, Dropout, Flatten, LSTM
 from keras.optimizers import Adam
-from keras.preprocessing.sequence import pad_sequences
-model_dir = "./file/LSTM_model"
+# from keras.preprocessing.sequence import pad_sequences
+from keras.utils import pad_sequences
+
+
+model_dir = "./file/LSTM_model.h5"
 vec_dir = "./file/word2vec1.pickle"
 log_dir = "./log/LSTM.log"
 
@@ -87,3 +90,4 @@ for item in data:
     if result:
         num += 1
 print("检测率：", num/len(data))
+model.save_weights(model_dir + ".h5")

@@ -15,7 +15,7 @@ batch_size = 350
 epochs_num = 1
 process_datas_dir = "./file/process_datas.pickle"
 log_dir = "./log/LSTM.log"
-model_dir = "./file/LSTM_model"
+model_dir = "./file/LSTM_model.h5"
 
 
 def train(train_generator, train_size, input_num, dims_num):
@@ -32,7 +32,7 @@ def train(train_generator, train_size, input_num, dims_num):
     model.add(output)
     call = TensorBoard(log_dir=log_dir, write_grads=True, histogram_freq=0)
     model.compile(optimizer, loss="categorical_crossentropy", metrics=["accuracy"])
-    model.fit_generator(train_generator, steps_per_epoch=train_size // batch_size, epochs=epochs_num, callbacks=[call])
+    model.fit(train_generator, steps_per_epoch=train_size // batch_size, epochs=epochs_num, callbacks=[call])
     model.save_weights(model_dir)
     end = time.time()
     print("Over train job in %f s" % (end - start))

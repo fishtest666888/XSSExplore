@@ -13,7 +13,7 @@ init_session()
 batch_size = 500
 epochs_num = 1
 log_dir = "./log/MLP.log"
-model_dir = "./file/MLP_model"
+model_dir = "./file/MLP_model.h5"
 
 
 def train(train_generator, train_size, input_num, dims_num):
@@ -35,8 +35,8 @@ def train(train_generator, train_size, input_num, dims_num):
     model.add(layer3)
     call = TensorBoard(log_dir=log_dir, write_grads=True, histogram_freq=0)
     model.compile(optimizer, loss="categorical_crossentropy", metrics=["accuracy"])
-    model.fit_generator(train_generator, steps_per_epoch=train_size // batch_size, epochs=epochs_num, callbacks=[call])
-    model.save_weights(model_dir)
+    model.fit(train_generator, steps_per_epoch=train_size // batch_size, epochs=epochs_num, callbacks=[call])
+    model.save_weights(model_dir + ".h5")
     end = time.time()
     print("Over train job in %f s" % (end - start))
 
